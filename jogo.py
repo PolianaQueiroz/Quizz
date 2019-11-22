@@ -80,6 +80,7 @@ def cadastrar():
     global nomeDeUsuario
     print('\n================================================================================\n')
     nomeDeUsuario = input('\nDigite Seu nome jovem Padawan: ').upper()
+    nomeDeUsuario = nomeDeUsuario.replace(' ', '')
     print('\nPrepare-se para a primeira pergunta',nomeDeUsuario,'que a força esteja com você!\n')
     print('\n================================================================================\n')
 
