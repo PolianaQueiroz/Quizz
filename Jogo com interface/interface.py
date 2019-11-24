@@ -1,17 +1,72 @@
+import random
+import time
 import tkinter
 from tkinter import *
+from pygame import mixer
 
 nomeGlobal = "" #nome do jogador
 pontuacaoGlobal = 0
-perguntas = open("pergunta1.txt", "r",encoding='latin-1').readlines()
+perguntas = open("perguntas.txt", "r", encoding= 'latin-1').readlines()
 janelaGlobal = None
 janelaAviso = None
-nomeCaixaTexto = None
-indice_resposta = None
-respostaSelecionada = None
+nomeCaixaTexto =None
+indice_resposta =None
+respostaSelecionada =None
+textoRanking = None
 
 
-def validar_nome(event= None):
+#vai retorna o ranking já ordenado
+def exibirRanking(lista):
+    texto = ''
+    ran = open('rankingOrdenado.txt','w', encoding='latin-1')
+    texto+='\nVeja qual foi a sua posição no nosso Ranking, Jovem Padawan!\n'
+    texto+='\nSe você estiver entre os 3 primeiros você se tornou um JEDI!!\n'
+    time.sleep(3)
+    for i in lista:
+        texto+='\n'+i
+        ran.write(i + '\n')
+    return texto
+
+#função que ordena a pontuação do ranking
+def ordenaRanking():
+    listaOrdenados = []
+    desordenados = open('ranking.txt','r',encoding='latin-1')
+    desordenados = desordenados.read()
+    lista = desordenados.split()
+
+    while len(lista) != 0:
+        maior = 0
+        indice = 0
+        for i in range(len(lista)):
+            if not (i % 2 == 0):
+                if int(lista[i]) > maior:
+                    maior = int(lista[i])
+                    indice = i
+        listaOrdenados.append(lista[indice-1]  + ' - ' +  lista[indice] ) 
+        del lista[indice]
+        del lista[indice-1]
+    return exibirRanking(listaOrdenados)
+
+#função que cria o ranking
+def criarRanking ():
+    arquivo = open('ranking.txt', 'a',encoding='latin-1')
+    #vai mostrar pontos e nome de usuário
+    pU = ' {} {}\n '.format(nomeGlobal,pontuacaoGlobal)
+    arquivo.write(pU)
+    arquivo.close()
+
+
+#função para rodar a música enquanto o usuário joga
+def musica():
+    mixer.init()
+    mixer.music.load('musica.mp3')
+    mixer.music.play()
+
+
+
+
+
+def validar_nome(event=None):
     global nomeCaixaTexto
     global nomeGlobal
     global janelaGlobal
@@ -34,7 +89,7 @@ def comecar_quiz():
     global janelaGlobal 
     
     for pergunta in perguntas:
-        exibir_pergunta(perguntas)
+        exibir_pergunta(pergunta)
     
         
         
@@ -140,30 +195,21 @@ def receber_nome_tela():
     '''
     janelaGlobal = Tk()
 
-    janelaGlobal.title("Quiz Star Wars") #definindo o titulo da janela principal, "title" é uma variavel interna da classe Tk(), ela já existe lá, apenas estamos mudando seu valor, esse tipo de variavel é chamada de "atributo" em OO, ele é acessado usando [Variavel_da_classe].[atributo]
+    janelaGlobal.title("Quiz Star Wars") #definindo o titulo da janela principal, "title" é uma variavel interna da classe Tk(), ela já existe lá, apenas mudei seu valor/atributo
 
     #janela.geometry("500x500") #definido o tamanho da tela em pixel
 
 
 
-    ''' Agora criaremos oq o tkinter define como "widget" é algo que estará na nossa
-    interface, por isso a nossa variavel janela tem que ser passado, pois esse "widget"
-    que, neste caso, é um texto de boas vindas pertencerá a uma "janela" principal da interface
-    '''
     msgBoasVindas = Label(janelaGlobal, text="Olá, jovem Padawan! Qual o seu nome?", font=("Arial Bold", 20))
     msgBoasVindas.grid(column=0, row=0) #aqui definimos a posição que um widget terá na tela, posicionando como posiçoes de uma matriz por colunas e linhas
 
 
-    '''Agora criaremos um "widget" que recebe texto que é do tipo Entry, como
-    sempre passando a janela principal que ele pertence'''
     nomeCaixaTexto = Entry(janelaGlobal)
     nomeCaixaTexto.grid(column=0, row=1) #definindo a posição na tela, nesse caso abaixo da msg de boas vindas
     nomeCaixaTexto.bind('<Return>', validar_nome)
 
-    '''Agora criaremos um "widget" que é um botão, chamado Button, como
-    sempre passando a janela principal que ele pertence, mas nesse caso escolheremos uma
-    função que define oq vai ser feito quando o botão for apertado
-    nesse caso processar e guardar o nome do usuario'''
+    
     botaoNome = Button(janelaGlobal, text="Enviar", command=validar_nome) #command=FUNÇÃO QUE SERÁ EXE. APOS APERTAR BOTAO
     botaoNome.grid(column=0, row=2) #definindo a posição na tela
 
@@ -176,8 +222,16 @@ def exibir_pontos():
     janelaGlobal.title("Quiz Star Wars")
     msgBoasVindas = Label(janelaGlobal, text="FIM DE JOGO,"+nomeGlobal+"! Você fez "+str(pontuacaoGlobal)+" pontos!", font=("Arial Bold", 20))
     msgBoasVindas.grid(column=0, row=0) #aqui definimos a posição que um widget
+    
+    Ranking = Label(janelaGlobal, text=textoRanking, font=("Arial Bold", 20))
+    Ranking.grid(column=0, row=1)
     botaoNome = Button(janelaGlobal, text="Sair", command=janelaGlobal.destroy) #command=FUNÇÃO QUE SERÁ EXE. APOS APERTAR BOTAO
     botaoNome.grid(column=0, row=2) #definindo a posição na tela
-    
+
+#chamando as funções
+musica()    
 receber_nome_tela()
+criarRanking()
+textoRanking = ordenaRanking()
 exibir_pontos()
+
