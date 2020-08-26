@@ -1,0 +1,5 @@
+Bem vindo Jovem Padawan
+1-Cada questao que voce acerta te leva para proxima questao
+2-Se voce errar uma questao o jogo acabou para voce
+3-Para saber qual sua posicao no nosso jogo click no botão ranking
+
